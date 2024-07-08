@@ -1,0 +1,61 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mlet_tech_challenge_phase2"
+description = "Tech Challenge FIAP - Big Data Architecture (Fase 2)"
+readme = "README.md"
+requires-python = ">=3.7"
+keywords = ["cookiecutter"]
+license = { text = "MIT License" }
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+]
+dependencies = []
+version = "0.0.0"
+dynamic = ["version"]
+
+[project.scripts]
+mlet_tech_challenge_phase2 = "mlet_tech_challenge_phase2.__main__:main"
+
+# Tool
+[tool.setuptools.packages]
+find = { exclude = ["tests*"] }
+
+[tool.coverage.run]
+plugins = ["covdefaults"]
+source = ["mlet_tech_challenge_phase2"]
+
+[tool.mypy]
+check_untyped_defs = true
+disallow_any_generics = true
+disallow_incomplete_defs = true
+disallow_untyped_defs = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+ignore_errors = true
+
+[tool.black]
+line-length = 79
+target-version = ["py311"]
+exclude = "((.eggs | .git | .pytest_cache | build | dist))"
+
+[tool.isort]
+profile = "black"
+line_length = 79
+
+[tool.interrogate]
+ignore-init-method = false
+ignore-init-module = true
+fail-under = 100
+quiet = false
+color = true
+omit-covered-files = true
