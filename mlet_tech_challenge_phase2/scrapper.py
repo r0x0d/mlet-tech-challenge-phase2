@@ -1,8 +1,9 @@
-from typing import Self
+from typing import Any, Self
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.ui import WebDriverWait
 
 
@@ -42,40 +43,60 @@ class WebScrapper:
         assert expect_to in self._driver.title
         return self
 
-    def switch_to_iframe(self, iframe_id: str) -> Self:
-        """Switch to the desired iframe by using the iframe_id from the page."""
-        iframe = WebDriverWait(self._driver, 10).until(
-            EC.presence_of_all_elements_located((By.ID, iframe_id)),
-        )[0]
-        self._driver.switch_to.frame(iframe)
+    def select_search_type(self, option_value: str) -> Self:
+        """Interact with the select element and change it's value"""
+        select_element = self._driver.find_element(By.ID, "segment")
+        select = Select(select_element)
+        select.select_by_value(option_value)
+
         return self
 
-    def get_table_data(self):
+    def get_table_data(self) -> dict[str, list[str]]:
         """Retrieve the table data from the website."""
-        table = self._driver.find_element(By.XPATH, "//table/tbody")
+        all_table_data: dict[str, list[str]] = {}
+        while True:
+            # Just wait for the table to load
+            WebDriverWait(self._driver, 10).until(
+                EC.presence_of_all_elements_located(
+                    (By.XPATH, "//table/tbody"),
+                ),
+            )
+            WebDriverWait(self._driver, 10).until(
+                EC.presence_of_all_elements_located(
+                    (By.CLASS_NAME, "pagination-next"),
+                ),
+            )
 
-        # Each tr maps the current possibilities. It will be just tr -> td[n], tr -> td[n]
-        # The first td[0] can be either the product or just a blank line that
-        # contains some other data that must be in a list
-        return table.find_elements(By.TAG_NAME, "tr")
+            table = self._driver.find_element(By.XPATH, "//table/tbody")
+            pagination_next = self._driver.find_element(
+                By.CLASS_NAME,
+                "pagination-next",
+            )
+            # Each tr maps the current possibilities. It will be just tr -> td[n], tr -> td[n]
+            # The first td[0] can be either the product or just a blank line that
+            # contains some other data that must be in a list
+            elements = table.find_elements(By.TAG_NAME, "tr")
+            parse_data(all_table_data, elements)
+
+            if "disabled" in pagination_next.get_dom_attribute("class"):
+                break
+
+            pagination_next.click()
+
+        return all_table_data
 
 
-def parse_data(rows: list) -> dict[str, list[str]]:
+def parse_data(
+    retrievable_data: dict[str, list[Any]],
+    rows: list[Any],
+) -> None:
     """Parse data gathered from the website"""
     header = ""
-    ordered_data = {}
-
     for row in rows:
         data = [a.text for a in row.find_elements(By.TAG_NAME, "td")]
-        # It means that we have a header in here
-        if len(data) == 6:
-            header = data[0]
-            # We don't care about the name in the data, only to take it as a header
-            data.pop(0)
+        header = data.pop(0)
 
-        if header not in ordered_data:
-            ordered_data[header] = []
+        if header not in retrievable_data:
+            retrievable_data[header] = []
 
-        ordered_data[header].append(data)
-
-    return ordered_data
+        retrievable_data[header].append(data)
