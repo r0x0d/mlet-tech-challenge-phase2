@@ -10,10 +10,10 @@ import sys
 
 sys.path.insert(0, os.path.abspath("../.."))
 
-project = 'mlet-tech-challenge-phase2'
-copyright = '2023, Rodolfo Olivieri'
-author = 'Rodolfo Olivieri'
-release = '0.0.0'
+project = "mlet-tech-challenge-phase2"
+copyright = "2023, Rodolfo Olivieri"
+author = "Rodolfo Olivieri"
+release = "0.0.0"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -34,9 +34,8 @@ intersphinx_mapping = {
     "sqlalchemy": ("https://docs.sqlalchemy.org/en/14/", None),
 }
 
-templates_path = ['_templates']
+templates_path = ["_templates"]
 exclude_patterns = []
-
 
 
 # -- Options for HTML output -------------------------------------------------
