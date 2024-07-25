@@ -1,4 +1,4 @@
 boto3
-fastparquet
 pandas
 selenium
+pyarrow

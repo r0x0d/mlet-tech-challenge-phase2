@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Any, Self
 
 from selenium import webdriver
@@ -53,7 +54,15 @@ class WebScrapper:
 
     def get_table_data(self) -> dict[str, list[str]]:
         """Retrieve the table data from the website."""
-        all_table_data: dict[str, list[str]] = {}
+        all_table_data: dict[str, list[str]] = {
+            'setor': [],
+            'codigo': [],
+            'acao': [],
+            'tipo': [],
+            'qtde_teorica': [],
+            'participacao_percentual': [],
+            'participacao_acumulada': [],
+        }
         while True:
             # Just wait for the table to load
             WebDriverWait(self._driver, 10).until(
@@ -91,12 +100,14 @@ def parse_data(
     rows: list[Any],
 ) -> None:
     """Parse data gathered from the website"""
-    header = ""
     for row in rows:
-        data = [a.text for a in row.find_elements(By.TAG_NAME, "td")]
-        header = data.pop(0)
+        data = tuple([a.text for a in row.find_elements(By.TAG_NAME, "td")])
+        setor, codigo, acao, tipo, qtde_teorica, part, part_acum = data
 
-        if header not in retrievable_data:
-            retrievable_data[header] = []
-
-        retrievable_data[header].append(data)
+        retrievable_data['setor'].append(setor)
+        retrievable_data['codigo'].append(codigo)
+        retrievable_data['acao'].append(acao)
+        retrievable_data['tipo'].append(tipo)
+        retrievable_data['qtde_teorica'].append(qtde_teorica)
+        retrievable_data['participacao_percentual'].append(part)
+        retrievable_data['participacao_acumulada'].append(part_acum)

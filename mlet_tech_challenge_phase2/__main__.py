@@ -22,6 +22,7 @@ def main() -> int:
     dataframe = convert_raw_to_dataframe(table_data)
     write_to_parquet(dataframe, "raw-bovespa.parquet")
 
+    print(dataframe)
     storage = S3Storage()
     storage.create_bucket(name="raw-bovespa")
     today = datetime.now()
